@@ -1,123 +1,114 @@
-# Local-RAG-Qwen
+#VaultRAG
 
-An offline Retrieval-Augmented Generation (RAG) system utilizing local HuggingFace embeddings and a local Qwen LLM to perform accurate question answering over your PDF documents.
+> An offline, privacy-first Retrieval-Augmented Generation system combining Hybrid Dense-Sparse retrieval with a local Qwen LLM — no cloud, no API keys, just your documents and your machine.
+
+---
 
 ## Architecture
 
-This project implements a **Hybrid Dense-Sparse Retrieval** pipeline with an intelligent routing mechanism:
-1. **Dense Retrieval**: Utilizes `langchain-huggingface` with the `BAAI/bge-small-en-v1.5` embeddings model and a local `FAISS` vector database.
-2. **Sparse Retrieval**: Uses a `BM25` retrieval index for keyword-based matches.
-3. **Hybrid Search Fusion**: Combines candidate documents from both dense and sparse sources using **Reciprocal Rank Fusion (RRF)** to produce a unified, ranked list of relevant context.
-4. **Prompt Routing Step**: Uses a lenient classification prompt to check if the question matches the topics/keywords in the retrieved context.
-   - If **YES**, it enters **RAG Mode** to answer the question using the context.
-   - If **NO**, it routes to **General Knowledge Mode** and answers using the model's pretrained general knowledge (without showing empty source citations).
+This project implements a **Hybrid Dense-Sparse Retrieval pipeline** with an intelligent routing mechanism:
+
+| Component | Technology |
+|---|---|
+| Dense Retrieval | FAISS + `BAAI/bge-small-en-v1.5` embeddings |
+| Sparse Retrieval | BM25 keyword index |
+| Fusion Strategy | Reciprocal Rank Fusion (RRF) |
+| LLM | Qwen 2.5 3B (via Ollama / llama.cpp) |
+| API Layer | FastAPI (OpenAI-compatible) |
+
+### Prompt Routing
+- **RAG Mode** — question matches retrieved context → answers using your documents
+- **General Knowledge Mode** — no match → answers from model's pretrained knowledge
 
 ---
 
 ## Features
 
-- **Local & Offline**: All computations (embeddings generation, vector search, and model inference) run locally.
-- **Hybrid Retrieval**: Combines semantic meaning (dense) and keyword exact matches (sparse) for maximum accuracy.
-- **OpenAI-Compatible API**: Implements standard `/v1/chat/completions` and `/v1/models` endpoints, allowing seamless integration with UIs like **Open WebUI**.
-- **Dynamic Re-indexing**: Supports reloading and rebuilding document indexes on the fly.
+- 🔒 **Fully Local & Offline** — embeddings, vector search, and inference run on your machine
+- 🔍 **Hybrid Retrieval** — semantic (dense) + keyword (sparse) for maximum accuracy
+- 🔌 **OpenAI-Compatible API** — plug into Open WebUI or any OpenAI-compatible client
+- ♻️ **Dynamic Re-indexing** — rebuild document indexes on the fly
+- 🚉 **Mockup Portal** — IRCTC-inspired UI with AskDisha 2.0 floating chat widget
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **Frameworks**: FastAPI, Uvicorn, LangChain
-- **Embeddings Model**: `BAAI/bge-small-en-v1.5`
-- **Vector Database**: FAISS (CPU)
-- **Sparse Index**: BM25 (`rank-bm25`)
-- **LLM**: Qwen 2.5 3B (run locally via Ollama or custom llama.cpp container)
+- **Frameworks:** FastAPI, Uvicorn, LangChain
+- **Embeddings:** `BAAI/bge-small-en-v1.5` (HuggingFace)
+- **Vector DB:** FAISS (CPU)
+- **Sparse Index:** BM25 (`rank-bm25`)
+- **LLM:** Qwen 2.5 3B (local via Ollama or llama.cpp)
 
 ---
 
-## Getting Started
+##  Getting Started
 
 ### Prerequisites
-
-Ensure you have Python 3.10+ installed and the local LLM running on port `12434`.
+- Python 3.10+
+- Local LLM running on port `12434`
 
 ### Installation
 
-1. Clone the repository and navigate to the directory:
-   ```bash
-   git clone https://github.com/avummdedhiaa24-ship-it/Local-RAG-Qwen.git
-   cd Local-RAG-Qwen
-   ```
-
-2. Create a virtual environment and install the dependencies:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-### Running the RAG Server
-
-Run the Uvicorn FastAPI server:
 ```bash
-python run.py
+git clone https://github.com/yourusername/FusionRAG-Qwen.git
+cd FusionRAG-Qwen
+
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+
+pip install -r requirements.txt
 ```
-By default, the server runs on `http://127.0.0.1:8000`.
 
----
+### Run the Server
 
-## API Endpoints
-
-- **`GET /status`**: Returns the path of the currently loaded document directory.
-- **`POST /load-folder`**: Loads and indexes PDF documents from a specified directory.
-  - *Payload*: `{"folder": "/path/to/pdfs"}`
-- **`POST /rebuild`**: Re-scans the PDF directory and rebuilds the FAISS/BM25 search indexes.
-- **`GET /v1/models`**: OpenAI-compatible endpoint returning the active model ID (`Local-RAG-Qwen`).
-- **`POST /v1/chat/completions`**: OpenAI-compatible chat completions endpoint.
-
----
-
-## Running with Docker Compose (Recommended)
-
-You can run both the local RAG FastAPI backend and the Open WebUI chatbot together using Docker Compose.
-
-1. **Start the stack**:
-   ```bash
-   docker compose up -d --build
-   ```
-   *Note: Ensure your local LLM (Ollama/Qwen) is running on port `12434` on the host.*
-
-2. **Access the chatbot**:
-   - The **Mockup passenger portal with the AskDisha 2.0 style floating chat widget** is served at: `http://localhost:8000`
-   - The standalone **Open WebUI dashboard** is served at: `http://localhost:3000`
-   - The widget in the portal dynamically loads the Open WebUI instance inside its iframe.
-
----
-
-## Alternative: Running services individually
-
-### 1. Run the RAG Server locally
 ```bash
 python run.py
 ```
 
-### 2. Run Open WebUI in Docker
-```bash
-docker run -d -p 3000:8080 \
-  -e OPENAI_API_BASE_URL=http://host.docker.internal:8000/v1 \
-  -e OPENAI_API_KEY=dummy \
-  --name open-webui \
-  --restart always \
-  -v open-webui:/app/backend/data \
-  ghcr.io/open-webui/open-webui:latest
-```
-
+Server starts at `http://127.0.0.1:8000`
 
 ---
 
-## Integrated Mockup Site & Floating Chat Widget
+## 🐳 Docker Compose (Recommended)
 
-This project includes a mockup of a public portal (an Indian Railways / IRCTC-inspired theme) served directly at the root of the RAG API (`http://localhost:8000/`).
+Runs the RAG backend + Open WebUI together:
 
-It features:
-- **AskDisha 2.0 Style Chat Widget**: A premium floating chat widget located in the bottom-right corner.
-- **Embedded Open WebUI**: Clicking the launcher button expands an overlay container that displays the actual running Open WebUI instance (`http://localhost:3000`) via an iframe. This allows users to access native Open WebUI chats, history, settings, and accounts directly within the mockup portal.
-- **Prerequisites**: Ensure both the RAG API server (`python run.py`) and the Open WebUI Docker container are running.
+```bash
+docker compose up -d --build
+```
+
+| Service | URL |
+|---|---|
+| Mockup Portal + Chat Widget | `http://localhost:8000` |
+| Open WebUI Dashboard | `http://localhost:3000` |
+
+> Ensure your local LLM (Ollama/Qwen) is running on port `12434` on the host.
+
+---
+
+## 📡 API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/status` | Currently loaded document directory |
+| `POST` | `/load-folder` | Load & index PDFs from a folder |
+| `POST` | `/rebuild` | Rebuild FAISS + BM25 indexes |
+| `GET` | `/v1/models` | OpenAI-compatible model list |
+| `POST` | `/v1/chat/completions` | OpenAI-compatible chat endpoint |
+
+---
+
+## 💬 Mockup Portal & Chat Widget
+
+Served at `http://localhost:8000/` — an IRCTC-inspired public portal featuring:
+
+- **AskDisha 2.0** style floating chat widget (bottom-right)
+- Embedded Open WebUI via iframe
+- Access chat history, settings, and accounts within the portal
+
+---
+
+## 📄 License
+
+MIT License — free to use, modify, and distribute.
