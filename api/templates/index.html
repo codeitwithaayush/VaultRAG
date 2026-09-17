@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Railways - IRCTC Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Mockup Background Website Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            overflow: hidden;
+            height: 100vh;
+        }
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-circle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0f2b5c 0%, #1a4a96 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.2rem;
+            font-family: 'Outfit', sans-serif;
+        }
+        .logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: #0f2b5c;
+            font-size: 1.3rem;
+        }
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            font-weight: 500;
+            color: #666;
+        }
+        .nav-links li:hover {
+            color: #0f2b5c;
+            cursor: pointer;
+        }
+        .main-hero {
+            margin-top: 75px;
+            height: calc(100vh - 75px);
+            background: linear-gradient(180deg, rgba(240,244,248,0.5) 0%, rgba(220,228,240,0.5) 100%), url('https://images.unsplash.com/photo-1541417901794-a8e479eed572?q=80&w=2000') center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 8%;
+            position: relative;
+        }
+        .hero-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 550px;
+            box-shadow: 0 10px 30px rgba(15, 43, 92, 0.1);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            color: #0f2b5c;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+        .hero-desc {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        .booking-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+        }
+        .form-group input {
+            padding: 10px 12px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .form-group input:focus {
+            border-color: #0f2b5c;
+            box-shadow: 0 0 0 3px rgba(15, 43, 92, 0.1);
+        }
+        .btn-search {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #ff6b00 0%, #ff8c00 100%);
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
+        }
+
+        /* ========================================== */
+        /* OPEN WEBUI FLOATING IFRAME WIDGET          */
+        /* ========================================== */
+
+        /* Floating Launcher Button */
+        .widget-launcher {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0f2b5c 0%, #1a4a96 100%);
+            box-shadow: 0 8px 24px rgba(15, 43, 92, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .widget-launcher:hover {
+            transform: scale(1.08) translateY(-3px);
+            box-shadow: 0 12px 30px rgba(15, 43, 92, 0.45);
+        }
+        .widget-launcher svg {
+            width: 32px;
+            height: 32px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2;
+            transition: transform 0.4s;
+        }
+        .widget-launcher.open svg {
+            transform: rotate(90deg);
+        }
+        /* Notification badge */
+        .widget-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #ff3b30;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+            animation: pulseBadge 2s infinite;
+        }
+        @keyframes pulseBadge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        /* Floating Widget Card Container */
+        .widget-card {
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 450px;
+            height: 650px;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 45px rgba(0,0,0,0.18);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            transform: scale(0.9) translateY(30px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.45s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+        .widget-card.visible {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Top Minimize/Close Bar */
+        .widget-top-bar {
+            height: 42px;
+            background-color: #0d1117; /* Dark slate matching Open WebUI */
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #c9d1d9;
+            font-size: 0.82rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            user-select: none;
+        }
+        .top-bar-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .top-bar-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #2ea44f; /* Green online dot */
+            box-shadow: 0 0 6px #2ea44f;
+        }
+        .btn-minimize {
+            background: none;
+            border: none;
+            color: #8b949e;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .btn-minimize:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: #ff7b72; /* Red close color */
+        }
+        .btn-minimize svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2.5;
+        }
+
+        /* Full Frame Iframe */
+        .widget-iframe {
+            flex: 1;
+            width: 100%;
+            height: calc(100% - 42px);
+            border: none;
+            background-color: #0d1117; /* Matches default theme */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mockup Website Navbar -->
+    <nav class="navbar">
+        <div class="logo-container">
+            <div class="logo-circle">IR</div>
+            <span class="logo-text">INDIAN RAILWAYS</span>
+        </div>
+        <ul class="nav-links">
+            <li>Book Tickets</li>
+            <li>PNR Status</li>
+            <li>Train Schedule</li>
+            <li>Track Train</li>
+            <li>Contact Support</li>
+        </ul>
+    </nav>
+
+    <!-- Mockup Hero Landing Container -->
+    <header class="main-hero">
+        <div class="hero-card">
+            <h1 class="hero-title">Welcome to Indian Railways</h1>
+            <p class="hero-desc">Safety, Security, and Punctuality. Book train tickets, check schedules, and manage your trips securely online.</p>
+            
+            <div class="booking-form">
+                <div class="form-group">
+                    <label for="from">From Station</label>
+                    <input type="text" id="from" placeholder="e.g. MUMBAI CENTRAL">
+                </div>
+                <div class="form-group">
+                    <label for="to">To Station</label>
+                    <input type="text" id="to" placeholder="e.g. NEW DELHI">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="date">Journey Date</label>
+                    <input type="date" id="date" value="2026-06-25">
+                </div>
+                <button class="btn-search">Search Trains</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- FLOATING IFRAME CHATBOT WIDGET             -->
+    <!-- ========================================== -->
+
+    <!-- Launcher Button -->
+    <div id="widgetLauncher" class="widget-launcher">
+        <div class="widget-badge">1</div>
+        <!-- Chat Bubble Icon -->
+        <svg viewBox="0 0 24 24" id="launcherIcon">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+
+    <!-- Widget Panel Card hosting the Open WebUI iframe -->
+    <div id="widgetCard" class="widget-card">
+        
+        <!-- Top Bar with title and minimize button -->
+        <div class="widget-top-bar">
+            <div class="top-bar-title">
+                <div class="top-bar-dot"></div>
+                <span>AskDisha 2.0 (Powered by Open WebUI)</span>
+            </div>
+            
+            <button id="btnMinimize" class="btn-minimize" title="Minimize Chat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Embedded Open WebUI Chat Site Iframe -->
+        <iframe src="http://localhost:3000" class="widget-iframe" id="webuiIframe"></iframe>
+
+    </div>
+
+    <script>
+        const widgetLauncher = document.getElementById('widgetLauncher');
+        const widgetCard = document.getElementById('widgetCard');
+        const btnMinimize = document.getElementById('btnMinimize');
+
+        // Toggle widget visibility
+        widgetLauncher.addEventListener('click', () => {
+            widgetCard.classList.toggle('visible');
+            widgetLauncher.classList.toggle('open');
+            // Hide badge when opened
+            const badge = widgetLauncher.querySelector('.widget-badge');
+            if (badge) badge.style.display = 'none';
+        });
+
+        btnMinimize.addEventListener('click', () => {
+            widgetCard.classList.remove('visible');
+            widgetLauncher.classList.remove('open');
+        });
+    </script>
+</body>
+</html>
