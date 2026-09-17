@@ -1,4 +1,4 @@
-#VaultRAG
+**VaultRAG**
 
 > An offline, privacy-first Retrieval-Augmented Generation system combining Hybrid Dense-Sparse retrieval with a local Qwen LLM — no cloud, no API keys, just your documents and your machine.
 
